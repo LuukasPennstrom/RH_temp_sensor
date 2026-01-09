@@ -25,13 +25,6 @@ sd_card = adafruit_sdcard.SDCard(spi, sd_cs)
 vfs = storage.VfsFat(sd_card)
 storage.mount(vfs, "/sd")
 
-#New run detection
-if alarm.wake_alarm is None:
-    with open("/sd/log.txt", "a") as log_file:
-        # Adds a blank line and a separator to make the log readable
-        log_file.write("\n--- NEW SESSION ---\n")
-
-
 vbat_voltage = AnalogIn(board.VOLTAGE_MONITOR)
 
 def get_voltage(pin):
@@ -62,6 +55,6 @@ with open("/sd/log.txt", "a") as log_file:
     log_file.write(data_line)
 
 # --- Deep Sleep ---
-# Sleep for 60 seconds
-time_alarm = alarm.time.TimeAlarm(monotonic_time=time.monotonic() + 60)
+# Sleep for 900 seconds
+time_alarm = alarm.time.TimeAlarm(monotonic_time=time.monotonic() + 900)
 alarm.exit_and_deep_sleep_until_alarms(time_alarm)
