@@ -10,7 +10,7 @@ from adafruit_pcf8523.pcf8523 import PCF8523
 import adafruit_ahtx0
 import alarm
 
-# --- Hardware Setup ---
+# Hardware Setup
 i2c = board.I2C()
 sensor = adafruit_ahtx0.AHTx0(i2c)
 rtc = PCF8523(i2c)
@@ -25,12 +25,19 @@ sd_card = adafruit_sdcard.SDCard(spi, sd_cs)
 vfs = storage.VfsFat(sd_card)
 storage.mount(vfs, "/sd")
 
+# New session write for log
+if alarm.wake_alarm is None:
+    with open("/sd/log.txt", "a") as log_file:
+        # Adds a blank line and a separator to make the log readable
+        log_file.write("\n--- NEW SESSION ---\n")
+
+
 vbat_voltage = AnalogIn(board.VOLTAGE_MONITOR)
 
 def get_voltage(pin):
     return (pin.value * 3.3) / 65536 * 2
 
-# --- Main Logic ---
+# Main Logic
 temperature = sensor.temperature
 humidity = sensor.relative_humidity
 battery_voltage = get_voltage(vbat_voltage)
@@ -54,7 +61,7 @@ led.value = False
 with open("/sd/log.txt", "a") as log_file:
     log_file.write(data_line)
 
-# --- Deep Sleep ---
-# Sleep for 900 seconds
+# Deep Sleep
+# Sleep for 900 seconds / 15 minutes
 time_alarm = alarm.time.TimeAlarm(monotonic_time=time.monotonic() + 900)
 alarm.exit_and_deep_sleep_until_alarms(time_alarm)
