@@ -25,6 +25,13 @@ sd_card = adafruit_sdcard.SDCard(spi, sd_cs)
 vfs = storage.VfsFat(sd_card)
 storage.mount(vfs, "/sd")
 
+#New run detection
+if alarm.wake_alarm is None:
+    with open("/sd/log.txt", "a") as log_file:
+        # Adds a blank line and a separator to make the log readable
+        log_file.write("\n--- NEW SESSION ---\n")
+
+
 vbat_voltage = AnalogIn(board.VOLTAGE_MONITOR)
 
 def get_voltage(pin):
