@@ -62,6 +62,6 @@ with open("/sd/log.txt", "a") as log_file:
     log_file.write(data_line)
 
 # Deep Sleep
-# Sleep for 900 seconds / 15 minutes
-time_alarm = alarm.time.TimeAlarm(monotonic_time=time.monotonic() + 900)
+# Sleep for 900 seconds / 15 minutes (in reality, it's 897 + 3 s from the LED
+time_alarm = alarm.time.TimeAlarm(monotonic_time=time.monotonic() + 897)
 alarm.exit_and_deep_sleep_until_alarms(time_alarm)
