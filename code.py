@@ -5,7 +5,6 @@ import digitalio
 import storage
 import adafruit_sdcard
 from analogio import AnalogIn
-# Keeping your current working import path:
 from adafruit_pcf8523.pcf8523 import PCF8523
 import adafruit_ahtx0
 import alarm
@@ -31,9 +30,8 @@ if alarm.wake_alarm is None:
         # Adds a blank line and a separator to make the log readable
         log_file.write("\n--- NEW SESSION ---\n")
 
-
+# Voltage Reading
 vbat_voltage = AnalogIn(board.VOLTAGE_MONITOR)
-
 def get_voltage(pin):
     return (pin.value * 3.3) / 65536 * 2
 
@@ -57,11 +55,19 @@ led.value = True
 time.sleep(3) # 3s for indicating it is starting to write
 led.value = False
 
-# Write to SD
+# Write Data to SD
 with open("/sd/log.txt", "a") as log_file:
     log_file.write(data_line)
 
-# Deep Sleep
-# Sleep for 900 seconds / 15 minutes (in reality, it's 897 + 3 s from the LED
-time_alarm = alarm.time.TimeAlarm(monotonic_time=time.monotonic() + 897)
+# Deep Sleep Calculation
+current_seconds_in_hour = (current_time.tm_min * 60) + current_time.tm_sec
+log_interval = 15 * 60 #Define log interval, currently 15 minutes
+
+# Calculate seconds remaining until the next interval
+# The modulo (%) operator tells us how far we are past the last mark.
+seconds_past_interval = current_seconds_in_hour % log_interval
+seconds_to_sleep = log_interval - seconds_past_interval
+
+#Sleep
+time_alarm = alarm.time.TimeAlarm(monotonic_time=time.monotonic() + seconds_to_sleep)
 alarm.exit_and_deep_sleep_until_alarms(time_alarm)
